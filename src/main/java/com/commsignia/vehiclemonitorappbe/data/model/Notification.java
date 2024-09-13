@@ -19,7 +19,6 @@ import lombok.Setter;
 @Table(name = "notification")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Builder
