@@ -13,8 +13,11 @@ import com.commsignia.vehiclemonitorappbe.data.model.Vehicle;
 @Repository
 public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
 
-    @Query("SELECT v FROM Vehicle v WHERE sqrt(pow(v.latitude - :latitude, 2) + pow(v.longitude - :longitude, 2)) <= "
-           + ":radius")
+    @Query(
+        value = "SELECT v FROM Vehicle v WHERE sqrt(pow(v.latitude - :latitude, 2) + pow(v.longitude - :longitude, 2)) <= "
+           + ":radius",
+        nativeQuery = true
+    )
     Set<Vehicle> findByLocationWithinRadius(
         @Param("latitude") Double latitude,
         @Param("longitude") Double longitude,
