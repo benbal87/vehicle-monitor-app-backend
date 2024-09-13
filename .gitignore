@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Vehicle Simulator Python Venv ###
+/vehicle-simulator/venv
