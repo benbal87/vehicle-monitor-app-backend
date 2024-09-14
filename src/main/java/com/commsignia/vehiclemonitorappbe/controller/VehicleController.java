@@ -1,7 +1,5 @@
 package com.commsignia.vehiclemonitorappbe.controller;
 
-import java.util.Set;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.commsignia.vehiclemonitorappbe.controller.model.CreateNotificationRequest;
 import com.commsignia.vehiclemonitorappbe.controller.model.VehicleLocationRequest;
+import com.commsignia.vehiclemonitorappbe.controller.model.VehicleRegistrationResponse;
+import com.commsignia.vehiclemonitorappbe.controller.model.VehiclesResponse;
 import com.commsignia.vehiclemonitorappbe.data.model.Notification;
 import com.commsignia.vehiclemonitorappbe.data.model.Vehicle;
 import com.commsignia.vehiclemonitorappbe.service.NotificationService;
@@ -66,13 +66,14 @@ public class VehicleController {
     )
     @GetMapping("/vehicles")
     @ResponseBody
-    public ResponseEntity<Set<Vehicle>> getVehiclesInRadius(
+    public ResponseEntity<VehiclesResponse> getVehiclesInRadius(
         @RequestParam double latitude,
         @RequestParam double longitude,
         @RequestParam double radius
     ) {
         var vehiclesInRadius = vehicleService.getVehiclesInRadius(latitude, longitude, radius);
-        return ResponseEntity.ok().body(vehiclesInRadius);
+        var response = new VehiclesResponse(vehiclesInRadius);
+        return ResponseEntity.ok().body(response);
     }
 
     @Operation(
@@ -86,9 +87,10 @@ public class VehicleController {
     )
     @PostMapping("/vehicles")
     @ResponseBody
-    public ResponseEntity<Long> registerVehicle() {
+    public ResponseEntity<VehicleRegistrationResponse> registerVehicle() {
         var vehicleId = vehicleService.registerNewVehicle().getId();
-        return ResponseEntity.ok().body(vehicleId);
+        var response = new VehicleRegistrationResponse(vehicleId);
+        return ResponseEntity.ok().body(response);
     }
 
     @Operation(

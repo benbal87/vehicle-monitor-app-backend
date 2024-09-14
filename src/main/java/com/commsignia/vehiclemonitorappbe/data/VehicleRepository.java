@@ -1,6 +1,6 @@
 package com.commsignia.vehiclemonitorappbe.data;
 
-import java.util.Set;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -14,22 +14,24 @@ import com.commsignia.vehiclemonitorappbe.data.model.Vehicle;
 public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
 
     @Query(
-        value = "SELECT v FROM Vehicle v WHERE sqrt(pow(v.latitude - :latitude, 2) + pow(v.longitude - :longitude, 2)) <= "
-           + ":radius",
+        value = "SELECT * FROM vehicle WHERE sqrt(pow(latitude - :latitude, 2) + pow(longitude - :longitude, 2)) <= "
+                + ":radius",
         nativeQuery = true
     )
-    Set<Vehicle> findByLocationWithinRadius(
+    List<Vehicle> findByLocationWithinRadius(
         @Param("latitude") Double latitude,
         @Param("longitude") Double longitude,
         @Param("radius") Double radius
     );
 
     @Modifying
-    @Query("UPDATE Vehicle v SET v.latitude = :latitude, v.longitude = :longitude WHERE v.id = :id")
-    int updateLocationById(
+    @Query(
+        "UPDATE Vehicle v SET v.latitude = :latitude, v.longitude = :longitude WHERE v.id = :vehicleId"
+    )
+    int updateVehicleLocation(
         @Param("latitude") Double latitude,
         @Param("longitude") Double longitude,
-        @Param("id") Long id
+        @Param("vehicleId") Long vehicleId
     );
 
 }
