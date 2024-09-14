@@ -22,6 +22,7 @@ def cli():
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument('host', type=str)
     arg_parser.add_argument('port', type=int)
+    arg_parser.add_argument('path', type=str)
     arg_parser.add_argument('--num', type=int, default=10)
     arg_parser.add_argument('--lat', type=float, default=47.47581)
     arg_parser.add_argument('--lon', type=float, default=19.05749)
@@ -29,13 +30,13 @@ def cli():
 
 
 class Vehicle:
-    def __init__(self, host, port, latitude, longitude):
+    def __init__(self, host, port, path, latitude, longitude):
         self.latitude = latitude
         self.longitude = longitude
 
         self.id = None
 
-        self.base_url = f'http://{host}:{port}'
+        self.base_url = f'http://{host}:{port}{path}'
 
         self.last_movement_change_at = time.time()
         self.next_movement_change_at = self.last_movement_change_at
@@ -46,6 +47,9 @@ class Vehicle:
         self.prefix = None
 
     def register(self):
+        url = f'{self.base_url}/vehicles'
+        LOGGER.info("REGISTRATION URL: " + url)
+
         res = requests.post(f'{self.base_url}/vehicles', json={})
 
         if res.status_code != 200:
@@ -154,7 +158,7 @@ class Vehicle:
 
 if __name__ == '__main__':
     args = cli().parse_args()
-    vehicles = [Vehicle(args.host, args.port, args.lat, args.lon)
+    vehicles = [Vehicle(args.host, args.port, args.path, args.lat, args.lon)
                 for _ in range(args.num)]
 
     try:
