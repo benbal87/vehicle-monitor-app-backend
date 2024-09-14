@@ -13,8 +13,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -25,7 +23,6 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 @Builder
 public class Vehicle {
 
@@ -41,10 +38,8 @@ public class Vehicle {
     )
     private Long id;
 
-    @NonNull
     private Double latitude;
 
-    @NonNull
     private Double longitude;
 
     @OneToMany(mappedBy = "vehicle")
