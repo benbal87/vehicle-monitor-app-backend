@@ -6,8 +6,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.commsignia.vehiclemonitorappbe.controller.model.VehicleDTO;
 import com.commsignia.vehiclemonitorappbe.data.VehicleRepository;
 import com.commsignia.vehiclemonitorappbe.data.model.Vehicle;
+import com.commsignia.vehiclemonitorappbe.mapper.VehicleMapper;
 import com.commsignia.vehiclemonitorappbe.util.JsonUtil;
 import com.commsignia.vehiclemonitorappbe.websocket.VehicleWebSocketHandler;
 
@@ -27,14 +29,17 @@ public class VehicleService {
     }
 
     @Transactional(readOnly = true)
-    public List<Vehicle> getVehiclesInRadius(Double latitude, Double longitude, Double radius) {
-        return vehicleRepository.findByLocationWithinRadius(latitude, longitude, radius);
+    public List<VehicleDTO> getVehiclesInRadius(Double latitude, Double longitude, Double radius) {
+        List<Vehicle> byLocationWithinRadius =
+            vehicleRepository.findByLocationWithinRadius(latitude, longitude, radius);
+        return VehicleMapper.toDTOList(byLocationWithinRadius);
     }
 
     @Transactional
-    public Vehicle registerNewVehicle() {
+    public VehicleDTO registerNewVehicle() {
         Vehicle vehicle = Vehicle.builder().build();
-        return vehicleRepository.save(vehicle);
+        Vehicle save = vehicleRepository.save(vehicle);
+        return VehicleMapper.toDTO(save);
     }
 
     @Transactional

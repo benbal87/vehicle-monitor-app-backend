@@ -1,14 +1,14 @@
 package com.commsignia.vehiclemonitorappbe.websocket;
 
+import java.io.IOException;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-
-import java.io.IOException;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 @Component
 public class VehicleWebSocketHandler extends TextWebSocketHandler {
@@ -39,4 +39,5 @@ public class VehicleWebSocketHandler extends TextWebSocketHandler {
             }
         }
     }
+
 }

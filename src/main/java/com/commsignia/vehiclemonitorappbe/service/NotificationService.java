@@ -2,9 +2,11 @@ package com.commsignia.vehiclemonitorappbe.service;
 
 import org.springframework.stereotype.Service;
 
+import com.commsignia.vehiclemonitorappbe.controller.model.NotificationDTO;
 import com.commsignia.vehiclemonitorappbe.data.NotificationRepository;
 import com.commsignia.vehiclemonitorappbe.data.model.Notification;
 import com.commsignia.vehiclemonitorappbe.data.model.Vehicle;
+import com.commsignia.vehiclemonitorappbe.mapper.NotificationMapper;
 
 @Service
 public class NotificationService {
@@ -15,10 +17,11 @@ public class NotificationService {
         this.notificationRepository = notificationRepository;
     }
 
-    public Notification createNotificationForVehicle(long vehicleId, String message) {
+    public NotificationDTO createNotificationForVehicle(long vehicleId, String message) {
         var vehicle = Vehicle.builder().id(vehicleId).build();
         var notification = Notification.builder().vehicle(vehicle).message(message).build();
-        return notificationRepository.save(notification);
+        Notification save = notificationRepository.save(notification);
+        return NotificationMapper.toDTO(save);
     }
 
 }

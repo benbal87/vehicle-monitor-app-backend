@@ -1,5 +1,7 @@
 package com.commsignia.vehiclemonitorappbe.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,11 +12,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.commsignia.vehiclemonitorappbe.controller.model.CreateNotificationRequest;
-import com.commsignia.vehiclemonitorappbe.controller.model.VehicleLocationRequest;
-import com.commsignia.vehiclemonitorappbe.controller.model.VehicleRegistrationResponse;
-import com.commsignia.vehiclemonitorappbe.controller.model.VehiclesResponse;
-import com.commsignia.vehiclemonitorappbe.data.model.Notification;
+import com.commsignia.vehiclemonitorappbe.controller.model.CreateNotificationRequestDTO;
+import com.commsignia.vehiclemonitorappbe.controller.model.NotificationDTO;
+import com.commsignia.vehiclemonitorappbe.controller.model.VehicleDTO;
+import com.commsignia.vehiclemonitorappbe.controller.model.VehicleLocationUpdateRequestDTO;
 import com.commsignia.vehiclemonitorappbe.data.model.Vehicle;
 import com.commsignia.vehiclemonitorappbe.service.NotificationService;
 import com.commsignia.vehiclemonitorappbe.service.VehicleService;
@@ -66,14 +67,13 @@ public class VehicleController {
     )
     @GetMapping("/vehicles")
     @ResponseBody
-    public ResponseEntity<VehiclesResponse> getVehiclesInRadius(
+    public ResponseEntity<List<VehicleDTO>> getVehiclesInRadius(
         @RequestParam double latitude,
         @RequestParam double longitude,
         @RequestParam double radius
     ) {
         var vehiclesInRadius = vehicleService.getVehiclesInRadius(latitude, longitude, radius);
-        var response = new VehiclesResponse(vehiclesInRadius);
-        return ResponseEntity.ok().body(response);
+        return ResponseEntity.ok().body(vehiclesInRadius);
     }
 
     @Operation(
@@ -87,10 +87,9 @@ public class VehicleController {
     )
     @PostMapping("/vehicles")
     @ResponseBody
-    public ResponseEntity<VehicleRegistrationResponse> registerVehicle() {
-        var vehicleId = vehicleService.registerNewVehicle().getId();
-        var response = new VehicleRegistrationResponse(vehicleId);
-        return ResponseEntity.ok().body(response);
+    public ResponseEntity<VehicleDTO> registerVehicle() {
+        var registrationResponse = vehicleService.registerNewVehicle();
+        return ResponseEntity.ok().body(registrationResponse);
     }
 
     @Operation(
@@ -105,7 +104,7 @@ public class VehicleController {
         requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "The location of the vehicle with latitude and longitude.",
             required = true,
-            content = @Content(schema = @Schema(implementation = CreateNotificationRequest.class))),
+            content = @Content(schema = @Schema(implementation = CreateNotificationRequestDTO.class))),
         responses = {
             @ApiResponse(responseCode = "200")
         }
@@ -114,9 +113,9 @@ public class VehicleController {
     @ResponseBody
     public ResponseEntity<Void> updateVehiclePosition(
         @PathVariable Long id,
-        @RequestBody VehicleLocationRequest body
+        @RequestBody VehicleLocationUpdateRequestDTO body
     ) {
-        boolean isUpdated = vehicleService.updateVehicleLocation(id, body.getLatitude(), body.getLongitude());
+        boolean isUpdated = vehicleService.updateVehicleLocation(id, body.latitude(), body.longitude());
         return isUpdated ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
     }
 
@@ -126,17 +125,17 @@ public class VehicleController {
         requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "Notification create request.",
             required = true,
-            content = @Content(schema = @Schema(implementation = CreateNotificationRequest.class))),
+            content = @Content(schema = @Schema(implementation = CreateNotificationRequestDTO.class))),
         responses = {
             @ApiResponse(responseCode = "200")
         }
     )
     @PostMapping("/notifications")
     @ResponseBody
-    public ResponseEntity<Void> createNotification(@RequestBody CreateNotificationRequest request) {
-        Notification notification =
-            notificationService.createNotificationForVehicle(request.getVehicleId(), request.getMessage());
-        return notification.getId() != null ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
+    public ResponseEntity<Void> createNotification(@RequestBody CreateNotificationRequestDTO body) {
+        NotificationDTO notification =
+            notificationService.createNotificationForVehicle(body.vehicleId(), body.message());
+        return notification.id() != null ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
     }
 
 }
