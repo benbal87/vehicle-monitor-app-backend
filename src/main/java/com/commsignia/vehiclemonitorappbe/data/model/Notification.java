@@ -1,5 +1,7 @@
 package com.commsignia.vehiclemonitorappbe.data.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -37,6 +39,7 @@ public class Notification {
 
     @ManyToOne
     @JoinColumn(name = "vehicle_id")
+    @JsonBackReference
     private Vehicle vehicle;
 
     private String message;

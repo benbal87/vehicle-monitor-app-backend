@@ -2,6 +2,8 @@ package com.commsignia.vehiclemonitorappbe.data.model;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -43,6 +45,7 @@ public class Vehicle {
     private Double longitude;
 
     @OneToMany(mappedBy = "vehicle")
+    @JsonManagedReference
     private Set<Notification> notifications;
 
 }
