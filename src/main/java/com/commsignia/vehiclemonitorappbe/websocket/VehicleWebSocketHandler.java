@@ -10,6 +10,9 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
 public class VehicleWebSocketHandler extends TextWebSocketHandler {
 
@@ -17,25 +20,24 @@ public class VehicleWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(@NonNull WebSocketSession session) {
-        System.out.println("--- CONNECTION ESTABLISHED: " + session.getId());
+        log.info("Websocket connection established. Session id={}", session.getId());
         sessions.add(session);
     }
 
     @Override
     public void afterConnectionClosed(@NonNull WebSocketSession session, @NonNull CloseStatus status) {
-        System.out.println("--- CONNECTION CLOSED: " + session.getId() + ", Status: " + status);
+        log.info("Websocket connection closed. SessionID={} | CloseStatus={}", session.getId(), status);
         sessions.remove(session);
     }
 
     public void sendUpdate(String message) {
-        System.out.println("--- SEND_UPDATE START");
-        System.out.println("--- SEND_UPDATE sessions.size()=" + sessions.size());
+        log.debug("WebSocket sendUpdate | Number of sessions: {}", sessions.size());
         for (WebSocketSession session : sessions) {
             try {
-                System.out.println("--- SEND_UPDATE: " + message);
+                log.debug("WebSocket send update. SessionID={} | Message={}", session.getId(), message);
                 session.sendMessage(new TextMessage(message));
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("Failed to send WebSocket message. SessionID={} | Message={}", session.getId(), message, e);
             }
         }
     }

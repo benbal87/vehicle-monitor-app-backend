@@ -1,7 +1,5 @@
 package com.commsignia.vehiclemonitorappbe.controller;
 
-import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +14,7 @@ import com.commsignia.vehiclemonitorappbe.controller.model.CreateNotificationReq
 import com.commsignia.vehiclemonitorappbe.controller.model.NotificationDTO;
 import com.commsignia.vehiclemonitorappbe.controller.model.VehicleDTO;
 import com.commsignia.vehiclemonitorappbe.controller.model.VehicleLocationUpdateRequestDTO;
+import com.commsignia.vehiclemonitorappbe.controller.model.VehiclesInRadiusResponseDTO;
 import com.commsignia.vehiclemonitorappbe.data.model.Vehicle;
 import com.commsignia.vehiclemonitorappbe.service.NotificationService;
 import com.commsignia.vehiclemonitorappbe.service.VehicleService;
@@ -27,7 +26,9 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("api/v1/vehicle")
 public class VehicleController {
@@ -67,11 +68,12 @@ public class VehicleController {
     )
     @GetMapping("/vehicles")
     @ResponseBody
-    public ResponseEntity<List<VehicleDTO>> getVehiclesInRadius(
+    public ResponseEntity<VehiclesInRadiusResponseDTO> getVehiclesInRadius(
         @RequestParam double latitude,
         @RequestParam double longitude,
         @RequestParam double radius
     ) {
+        log.debug("Fetching vehicles in radius with latitude={}, longitude={}, radius={}", latitude, longitude, radius);
         var vehiclesInRadius = vehicleService.getVehiclesInRadius(latitude, longitude, radius);
         return ResponseEntity.ok().body(vehiclesInRadius);
     }
@@ -88,6 +90,7 @@ public class VehicleController {
     @PostMapping("/vehicles")
     @ResponseBody
     public ResponseEntity<VehicleDTO> registerVehicle() {
+        log.debug("Registering a new vehicle");
         var registrationResponse = vehicleService.registerNewVehicle();
         return ResponseEntity.ok().body(registrationResponse);
     }
@@ -115,6 +118,12 @@ public class VehicleController {
         @PathVariable Long id,
         @RequestBody VehicleLocationUpdateRequestDTO body
     ) {
+        log.debug(
+            "Updating vehicle position for vehicle ID={}, new latitude={}, new longitude={}",
+            id,
+            body.latitude(),
+            body.longitude()
+        );
         boolean isUpdated = vehicleService.updateVehicleLocation(id, body.latitude(), body.longitude());
         return isUpdated ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
     }
@@ -133,6 +142,7 @@ public class VehicleController {
     @PostMapping("/notifications")
     @ResponseBody
     public ResponseEntity<Void> createNotification(@RequestBody CreateNotificationRequestDTO body) {
+        log.debug("Creating a notification for vehicle ID={}, with message={}", body.vehicleId(), body.message());
         NotificationDTO notification =
             notificationService.createNotificationForVehicle(body.vehicleId(), body.message());
         return notification.id() != null ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
